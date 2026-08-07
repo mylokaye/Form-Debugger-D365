@@ -83,6 +83,22 @@ CONFIG.URLS = {
 };
 
 /**
+ * Persisted extension state
+ * @const {Object}
+ */
+CONFIG.STORAGE_KEYS = {
+  EXTENSION_ENABLED: "extensionEnabled"
+};
+
+/**
+ * Default persisted values used for first-run and storage-error recovery
+ * @const {Object}
+ */
+CONFIG.DEFAULTS = {
+  EXTENSION_ENABLED: true
+};
+
+/**
  * DOM selectors used for form detection
  * @const {Object}
  */

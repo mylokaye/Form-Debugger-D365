@@ -1,4 +1,4 @@
-// content-script.js — Overlay with checkboxes and reload button
+// content-script.js — inspect and annotate Dynamics 365 forms while enabled
 
 // Config is loaded from config.js (loaded first in manifest.json)
 // Access configuration via the global CONFIG object
@@ -7,8 +7,15 @@ const STYLE_ID = CONFIG.ELEMENT_IDS.STYLE;
 const OVERLAY_ID = CONFIG.ELEMENT_IDS.OVERLAY;
 const HIDDEN_FIELDS_STYLE_ID = CONFIG.ELEMENT_IDS.HIDDEN_FIELDS_STYLE;
 const hiddenFieldLabels = new Map();
-let hiddenFieldsEnabled = true;
+let hiddenFieldsEnabled = false;
 let hiddenFieldsObserver = null;
+let formMutationObserver = null;
+let networkObserver = null;
+let extensionEnabled = CONFIG.DEFAULTS.EXTENSION_ENABLED;
+let extensionStateReady = false;
+let domReadyListenerAttached = false;
+let featuresStarted = false;
+const extensionStateWaiters = [];
 
 /**
  * Writes a consistently branded console message.
@@ -29,6 +36,131 @@ function writeLog(level, message, ...details) {
     CONFIG.LOGGING.PREFIX_STYLE,
     CONFIG.LOGGING.MESSAGE_STYLE
   );
+}
+
+/**
+ * Normalizes a stored extension state without allowing malformed values to
+ * disable the extension unexpectedly.
+ *
+ * @param {Object} data - Storage result
+ * @returns {boolean}
+ */
+function getStoredExtensionEnabled(data) {
+  const storedValue = data[CONFIG.STORAGE_KEYS.EXTENSION_ENABLED];
+  return typeof storedValue === 'boolean'
+    ? storedValue
+    : CONFIG.DEFAULTS.EXTENSION_ENABLED;
+}
+
+/**
+ * Starts the feature set after the persisted state has been resolved.
+ *
+ * @returns {void}
+ */
+function startExtensionFeatures() {
+  if (!extensionEnabled) return;
+
+  detectNetworkRequests();
+  // Hidden-field rendering is part of the master extension feature state.
+  showHiddenFields();
+
+  if (document.readyState === 'loading') {
+    if (domReadyListenerAttached) return;
+
+    domReadyListenerAttached = true;
+    document.addEventListener('DOMContentLoaded', handleDomReady, { once: true });
+    return;
+  }
+
+  handleDomReady();
+}
+
+/**
+ * Stops observers, diagnostics, and page annotations created by this extension.
+ *
+ * @returns {void}
+ */
+function stopExtensionFeatures() {
+  featuresStarted = false;
+
+  if (domReadyListenerAttached) {
+    document.removeEventListener('DOMContentLoaded', handleDomReady);
+    domReadyListenerAttached = false;
+  }
+
+  if (networkObserver) {
+    networkObserver.disconnect();
+    networkObserver = null;
+  }
+
+  if (formMutationObserver) {
+    formMutationObserver.disconnect();
+    formMutationObserver = null;
+  }
+
+  // Remove all hidden-field clones and styling as soon as the master toggle is off.
+  hideHiddenFields();
+}
+
+/**
+ * Applies a new enabled state to the content script runtime.
+ *
+ * @param {boolean} enabled - Whether extension features should run
+ * @returns {void}
+ */
+function applyExtensionState(enabled) {
+  const nextEnabled = typeof enabled === 'boolean'
+    ? enabled
+    : CONFIG.DEFAULTS.EXTENSION_ENABLED;
+  const stateChanged = !extensionStateReady || extensionEnabled !== nextEnabled;
+
+  extensionEnabled = nextEnabled;
+  extensionStateReady = true;
+
+  if (stateChanged) {
+    if (extensionEnabled) {
+      startExtensionFeatures();
+    } else {
+      stopExtensionFeatures();
+    }
+  }
+
+  const waiters = extensionStateWaiters.splice(0);
+  waiters.forEach((waiter) => waiter());
+}
+
+/**
+ * Handles DOM readiness for the enabled feature set.
+ *
+ * @returns {void}
+ */
+function handleDomReady() {
+  domReadyListenerAttached = false;
+  if (!extensionEnabled || featuresStarted) return;
+
+  featuresStarted = true;
+  writeLog('log', 'Form inspection started.');
+  monitorFormMutations();
+  detectFormId();
+  detectFormFields();
+  showHiddenFields();
+}
+
+/**
+ * Reads the extension state from local storage.
+ *
+ * @returns {void}
+ */
+function readExtensionState() {
+  chrome.storage.local.get([CONFIG.STORAGE_KEYS.EXTENSION_ENABLED], (data) => {
+    if (chrome.runtime.lastError) {
+      writeLog('warn', 'Extension state could not be read. Features remain enabled.', chrome.runtime.lastError.message);
+      applyExtensionState(CONFIG.DEFAULTS.EXTENSION_ENABLED);
+      return;
+    }
+
+    applyExtensionState(getStoredExtensionEnabled(data));
+  });
 }
 
 /**
@@ -238,7 +370,7 @@ function getHiddenFieldLabelAnchor(field) {
  * @returns {void}
  */
 function refreshHiddenFields() {
-  if (!hiddenFieldsEnabled) return;
+  if (!extensionEnabled || !hiddenFieldsEnabled) return;
 
   const fieldContainer = getFieldContainer();
   const currentHiddenFields = new Map();
@@ -279,6 +411,8 @@ function refreshHiddenFields() {
  * @returns {void}
  */
 function showHiddenFields() {
+  if (!extensionEnabled) return;
+
   hiddenFieldsEnabled = true;
   ensureHiddenFieldStyles();
   refreshHiddenFields();
@@ -327,21 +461,22 @@ function hideHiddenFields() {
  * @returns {void}
  */
 function detectNetworkRequests() {
+  if (!extensionEnabled || networkObserver || !window.PerformanceObserver) return;
+
   // Monitor for form API calls via PerformanceObserver if available
-  if (window.PerformanceObserver) {
-    try {
-      const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          if (entry.name && entry.name.includes('landingpageforms')) {
-            writeLog('log', 'Dynamics form API resource detected.');
-          }
+  try {
+    networkObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.name && entry.name.includes('landingpageforms')) {
+          writeLog('log', 'Dynamics form API resource detected.');
         }
-      });
-      observer.observe({ entryTypes: ['resource'] });
-      writeLog('log', 'Form resource monitoring started.');
-    } catch (e) {
-      writeLog('warn', 'Form resource monitoring is unavailable.', e.message);
-    }
+      }
+    });
+    networkObserver.observe({ entryTypes: ['resource'] });
+    writeLog('log', 'Form resource monitoring started.');
+  } catch (e) {
+    networkObserver = null;
+    writeLog('warn', 'Form resource monitoring is unavailable.', e.message);
   }
 }
 
@@ -422,6 +557,8 @@ function detectFormFields() {
  * @returns {void}
  */
 function monitorFormMutations() {
+  if (!extensionEnabled || formMutationObserver) return;
+
   const fieldContainer = getFieldContainer();
 
   if (!fieldContainer) {
@@ -431,7 +568,7 @@ function monitorFormMutations() {
 
   let lastFieldCount = fieldContainer.querySelectorAll(CONFIG.SELECTORS.FIELD_CONTROLS).length;
 
-  const observer = new MutationObserver(() => {
+  formMutationObserver = new MutationObserver(() => {
     const currentFieldCount = fieldContainer.querySelectorAll(CONFIG.SELECTORS.FIELD_CONTROLS).length;
 
     // Only log if count actually changed
@@ -441,7 +578,7 @@ function monitorFormMutations() {
     }
   });
 
-  observer.observe(fieldContainer, {
+  formMutationObserver.observe(fieldContainer, {
     childList: true,
     subtree: true
   });
@@ -456,39 +593,56 @@ function monitorFormMutations() {
 // updateOverlayStatus function removed - overlay no longer displayed on page
 
 /**
- * Message listener to respond to popup requests for form information
+ * Update running content-script features when the popup changes the state.
+ */
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== 'local') return;
+
+  const extensionChange = changes[CONFIG.STORAGE_KEYS.EXTENSION_ENABLED];
+  if (!extensionChange) return;
+
+  applyExtensionState(
+    typeof extensionChange.newValue === 'boolean'
+      ? extensionChange.newValue
+      : CONFIG.DEFAULTS.EXTENSION_ENABLED
+  );
+});
+
+/**
+ * Message listener to respond to popup requests for form information.
  */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!message || typeof message.type !== 'string') return;
 
-  if (message.type === CONFIG.MESSAGE_TYPES.GET_FORM_INFO) {
+  if (message.type !== CONFIG.MESSAGE_TYPES.GET_FORM_INFO) return;
+
+  const respondWithFormInfo = () => {
+    if (!extensionEnabled) {
+      sendResponse({
+        extensionEnabled: false,
+        formIdDetected: false,
+        formId: null
+      });
+      return;
+    }
+
     const formIdState = detectFormId();
 
     sendResponse({
+      extensionEnabled: true,
       formIdDetected: formIdState.found,
       formId: formIdState.formId
     });
+
+  };
+
+  if (!extensionStateReady) {
+    extensionStateWaiters.push(respondWithFormInfo);
+    return true;
   }
 
-  // TOGGLE_EXTENSION message removed - no overlay to toggle
+  respondWithFormInfo();
 });
 
-// Initialize - wait for DOM to be ready
-writeLog('log', 'Content script initialized.');
-detectNetworkRequests();
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    writeLog('log', 'Form inspection started.');
-    monitorFormMutations();
-    detectFormId();
-    detectFormFields();
-    showHiddenFields();
-  });
-} else {
-  writeLog('log', 'Form inspection started.');
-  monitorFormMutations();
-  detectFormId();
-  detectFormFields();
-  showHiddenFields();
-}
+// Resolve the persisted state before any feature starts.
+readExtensionState();

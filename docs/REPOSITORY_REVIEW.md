@@ -1,12 +1,12 @@
 # Repository Review
 
-Reviewed on 22 June 2026. This document describes the repository as found; it is not a promise that every current behavior is intentional.
+Reviewed on 7 August 2026. This document describes the repository as found; it is not a promise that every current behavior is intentional.
 
 ## Executive Summary
 
 The repository contains a small, readable, dependency-free Manifest V3 extension for Chrome and Edge. Its source is directly loadable from `Chrome-Edge/`; there is no compilation or packaging step. The implementation is split sensibly between a service worker, a content script, a popup, and shared constants.
 
-The extension keeps cache bypass active and automatically renders editable hidden-field copies. Form detection and permissions still need deliberate review because the extension supports forms embedded on arbitrary sites while its background URL handling is limited to Dynamics asset pages.
+The extension automatically renders editable hidden-field copies and applies cache bypass while its persisted feature toggle is enabled. Form detection and permissions still need deliberate review because the extension supports forms embedded on arbitrary sites while its background URL handling is limited to Dynamics asset pages.
 
 ## Current Structure
 
@@ -32,7 +32,7 @@ The extension keeps cache bypass active and automatically renders editable hidde
 └── README.md
 ```
 
-The manifest and README use version `1.2.1`. The declared action icons are 16, 48, and 128 pixels. The popup also uses the packaged 300-pixel icon for its centered brand mark.
+The manifest and README use version `1.3.0`. The declared action icons are 16, 48, and 128 pixels. The popup also uses the packaged 300-pixel icon for its centered brand mark.
 
 ## Architecture
 
@@ -42,6 +42,7 @@ The manifest and README use version `1.2.1`. The declared action icons are 16, 4
 
 - Manifest V3.
 - The `activeTab` permission.
+- The `storage` permission for the locally persisted feature-enabled preference.
 - English as the default locale, with ten supported languages across eleven packaged locale catalogs under `_locales/`.
 - `*://*.dynamics.com/*` host permission.
 - A classic background service worker at `background.js`.
@@ -52,25 +53,25 @@ Although `host_permissions` is limited to Dynamics domains, the `<all_urls>` con
 
 ### Shared Configuration
 
-`config.js` defines the global `CONFIG` object. It contains DOM IDs, timeouts, logging styles, support URLs, the Dynamics asset URL pattern, the no-cache hash, selectors, and message types.
+`config.js` defines the global `CONFIG` object. It contains DOM IDs, timeouts, logging styles, support URLs, the Dynamics asset URL pattern, the no-cache hash, selectors, message types, the feature state storage key, and its enabled-by-default value.
 
 Several values are remnants of a removed in-page overlay (`STYLE`, `OVERLAY`, `OVERLAY_Z_INDEX`, and related IDs). The CommonJS export branch is not used by the extension. Runtime message types are shared through `CONFIG.MESSAGE_TYPES`.
 
 ### Background Service Worker
 
-`background.js` imports `config.js` with `importScripts`, listens to `chrome.tabs.onUpdated`, and filters changed tab URLs using:
+`background.js` imports `config.js` with `importScripts`, listens to `chrome.tabs.onUpdated`, reads the persisted feature state, and filters changed or refreshed tab URLs using:
 
 ```text
 ^https://assets-[a-z]{3}.mkt.dynamics.com/
 ```
 
-For a matching URL, it appends `#d365mkt-nocache` when the hash is not already present. There is no activation preference or storage read.
+For a matching URL, it appends `#d365mkt-nocache` when the hash is not already present and the extension is enabled. It skips cache bypass while the extension is disabled.
 
 Tab-update callback errors are handled.
 
 ### Content Script
 
-`content-script.js` starts at `document_start` and:
+`content-script.js` starts at `document_start`, resolves the persisted feature state, and when enabled:
 
 - Observes resource performance entries containing `landingpageforms` and logs them.
 - Checks the first element matching `[data-form-id]` for Form ID metadata independently of field detection.
@@ -81,14 +82,15 @@ Tab-update callback errors are handled.
 - Automatically renders editable, non-submitting visual copies of native hidden inputs and Dynamics form-designer hidden field blocks.
 - Synchronizes edits from those visual copies to source controls for the current page session.
 
-It does not transmit detected data. Detection can succeed when the popup asks later, but mutation monitoring is not attached if the form container is inserted after the one initialization attempt.
+It does not transmit detected data. When disabled, it does not start the resource or mutation observers and removes the debug labels and stylesheet it created. Detection can succeed when the popup asks later, but mutation monitoring is not attached if the form container is inserted after the one initialization attempt.
 
 ### Popup
 
 `popup.html` contains all popup markup and CSS. `popup.js`:
 
 - Queries the active tab and requests form information from its content script.
-- Shows the Form ID, always-active cache-bypass status, and installed version in a compact branded panel.
+- Shows the feature toggle, Form ID, cache-bypass status, and installed version in a compact branded panel.
+- Persists the feature toggle in `chrome.storage.local` and refreshes the active tab after a successful change when possible.
 - Copies the Form ID to the clipboard.
 - Opens the support page from the popup information button.
 - Localizes visible popup text with `chrome.i18n.getMessage()` and displays the closest supported browser UI language.
@@ -97,7 +99,7 @@ The information button opens the centralized `CONFIG.URLS.SUPPORT` destination a
 
 ## State Model Found
 
-The extension has no persisted state. The background worker always applies cache bypass to supported Dynamics asset URLs. Form names and values are not stored or transmitted by the extension. Editing a shown field updates its source control, which the host page may transmit through its normal form submission.
+The extension persists one local boolean preference, `extensionEnabled`, defaulting to `true` when no value exists. The background worker and content script both honor that preference. Form names and values are not stored or transmitted by the extension. Editing a shown field updates its source control, which the host page may transmit through its normal form submission.
 
 ## Findings and Risks
 
@@ -121,7 +123,7 @@ The extension has no persisted state. The background worker always applies cache
 - Manifest V3 is already in use.
 - Shared constants reduce duplicated selectors, message types, URLs, logging styles, and URL patterns.
 - The service worker registers its listener at top level and does not depend on durable in-memory state.
-- The always-active design requires no persisted preference or storage permission.
+- The feature toggle has a small persisted state model, while form names and values remain outside extension storage.
 - The background worker avoids a tab update when the URL does not change.
 - The extension has no third-party runtime dependencies, remote code, analytics, or telemetry.
 - Popup scripts are external files, consistent with extension CSP requirements.

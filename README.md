@@ -28,7 +28,8 @@ For local development:
 - **Complete Dynamics field support** — Handles native hidden inputs and designer-hidden `input`, `select`, and `textarea` controls.
 - **Submission testing** — Synchronizes edits to the original source controls and dispatches normal `input` and `change` events.
 - **Dynamic form support** — Labels newly inserted hidden fields without creating duplicates.
-- **Compact popup** — Uses a 400 × 218px layout with the extension logo, cache status, Form ID, installed version, and support link.
+- **Feature toggle** — Enables or disables the extension's page features, stores that preference locally, and refreshes the active page when possible after a change.
+- **Compact popup** — Uses a 400 × 260px layout with the extension logo, feature toggle, cache status, Form ID, installed version, and support link.
 - **Consistent diagnostics** — Uses the **Dynamics 365 Form Debugger** console prefix with blue branding and clear black message text.
 - **Localized interface** — Supports the ten most-used web content languages through Chrome's native locale system.
 - **No runtime dependencies or telemetry** — Uses browser APIs and plain HTML, CSS, and JavaScript only.
@@ -39,8 +40,9 @@ For local development:
 2. The extension detects the form and automatically displays editable copies of its hidden fields.
 3. Hidden-field copies use the form's existing styles and a green border so they are easy to distinguish.
 4. Editing a displayed copy updates the corresponding original control used by the form submission.
-5. On supported Dynamics asset pages, cache bypass is applied automatically.
-6. Open the extension popup to view or copy the Form ID, confirm cache status, view the installed version, or open support.
+5. On supported Dynamics asset pages, cache bypass is applied automatically while the extension is enabled.
+6. Use the popup's **Extension features** toggle to pause or resume cache bypass, form detection, field rendering, and diagnostics. The active page is refreshed when the browser allows it.
+7. Open the extension popup to view or copy the Form ID, confirm cache status, view the installed version, or open support.
 
 Reload the extension and refresh existing form tabs after installing a local update so the latest content script is injected.
 
@@ -59,16 +61,17 @@ The extension does not collect, store, or transmit form values, browsing history
 - Form IDs are read from the current page and shown only in the popup.
 - Hidden-field values and edits remain in the current page session.
 - Edited values may be transmitted by the host website only when you submit its form.
-- The extension does not persist preferences or form data.
+- The extension stores only the enabled/disabled preference locally through `chrome.storage.local`; it does not persist form data.
 - Selecting the popup's information button opens the external [support website](https://mylokaye.info).
 
 ## Permissions and Site Access
 
 - **`activeTab`** — Allows the popup to request the detected Form ID from the current tab.
+- **`storage`** — Stores the user's enabled/disabled preference locally so the toggle applies across page reloads and browser sessions.
 - **`*://*.dynamics.com/*` host access** — Allows the service worker to apply cache bypass on supported Dynamics asset URLs.
 - **`<all_urls>` content-script access** — Allows detection when Dynamics forms are embedded on third-party websites. The content script limits field inspection to detected Dynamics form containers.
 
-The extension does not request the `storage` permission.
+The extension does not collect or transmit the locally stored preference.
 
 ## Supported Languages
 
@@ -106,6 +109,12 @@ Behavior changes should also be tested by loading `Chrome-Edge/` as an unpacked 
 
 ## Changelog
 
+### [1.3.0] - 2026-08-07
+
+- Added a persisted Extension features toggle that pauses page inspection, hidden-field rendering, diagnostics, and cache bypass.
+- The toggle now enables and disables editable hidden-field rendering together with the other extension features.
+- Refreshes the active page after a toggle change when the browser permits it.
+
 ### [1.2.1] - 2026-06-22
 
 - Added automatic editable rendering for native and Dynamics designer-hidden fields.
@@ -141,4 +150,4 @@ Visit [mylokaye.info](https://mylokaye.info) for support and feedback.
 
 - **Author:** Mylo Kaye
 - **License:** Apache 2.0
-- **Version:** 1.2.1
+- **Version:** 1.3.0
