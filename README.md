@@ -1,4 +1,6 @@
-# Dynamics 365 Form Debugger
+![Form Debugger](https://repository-images.githubusercontent.com/1092861955/ee316bce-716c-4a6d-be25-2f21917f9c0a)
+
+# Form Debugger for Dynamics 365 
 
 A dependency-free Chrome and Microsoft Edge extension for debugging **Dynamics 365 Customer Insights - Journeys forms**.
 
