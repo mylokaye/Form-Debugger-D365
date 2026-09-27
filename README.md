@@ -142,7 +142,7 @@ Behavior changes should also be tested by loading `Chrome-Edge/` as an unpacked 
 
 ## Support
 
-Visit [mylokaye.info](https://mylokaye.info) for support and feedback.
+Visit [mylokaye.me](https://mylokaye.me) for support and feedback.
 
 ## Legal Notice
 
