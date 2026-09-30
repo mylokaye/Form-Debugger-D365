@@ -1,4 +1,4 @@
-![Form Debugger](https://repository-images.githubusercontent.com/1092861955/ee316bce-716c-4a6d-be25-2f21917f9c0a)
+![Form Debugger Extension by Mylo Kaye](docs/readme-banner.jpg)
 
 # Form Debugger for Dynamics 365 
 
