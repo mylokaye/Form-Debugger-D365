@@ -22,7 +22,7 @@ Use a test form with no unsaved entries. The checks below do not require submitt
 2. Disable features. Confirm the trailing marker is removed and debug copies disappear. Re-enable features and confirm they return. Repeat with a query string and existing fragment, checking that both survive the toggle.
 3. Edit a hidden debug copy using a synthetic test value and check that its source control is updated. Do not submit the form; refresh the test page afterwards.
 4. Test late insertion and a script-embedded form on a third-party page. Confirm unrelated controls remain untouched. Cross-origin iframe inspection through the host page is outside the current supported flow.
-5. Open an ordinary website and a browser-internal page. The cache badge should be **Not applicable**, with no automatic URL modification. The Form ID row should be unavailable without errors.
+5. Open an ordinary website and a page without a content-script receiver, such as `about:blank`. Ordinary websites should show **Not applicable**. A restricted page may show **Status unavailable** when Chrome does not expose its URL. The Form ID row should be unavailable without errors or automatic URL changes.
 6. Reopen the popup after navigation and after a browser restart. Check enabled/disabled preference persistence, copy-to-clipboard, keyboard focus, and the support link.
 7. Inspect actual service-worker, popup, and target-page consoles for extension errors. Repeat the key standalone, toggle, and popup checks in Edge.
 
