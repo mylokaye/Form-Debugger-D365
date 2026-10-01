@@ -79,7 +79,7 @@ CONFIG.CACHE_BYPASS = {
 };
 
 CONFIG.URLS = {
-  SUPPORT: "https://mylokaye.info"
+  SUPPORT: "https://mylokaye.me"
 };
 
 /**
