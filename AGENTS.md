@@ -21,6 +21,8 @@ The shipped extension lives in `Chrome-Edge/` and currently uses Manifest V3 wit
 - `docs/REPOSITORY_REVIEW.md`: current architecture review, known gaps, and development priorities.
 - `docs/STORE_LISTING.md`: current store description, permission copy, and artwork inventory.
 - `docs/RELEASE_1.4.0.md`: version 1.4.0 package audit and verification boundaries.
+- `docs/PUBLISHING.md`: publication handoff and final browser/store checks.
+- `docs/PRIVACY_POLICY.md`: privacy text prepared for the public policy page.
 
 ## Current Runtime Flow
 

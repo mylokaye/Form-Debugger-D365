@@ -27,7 +27,14 @@ The extension automatically renders editable hidden-field copies and applies cac
 │   ├── popup.html
 │   └── popup.js
 ├── docs/
-│   └── REPOSITORY_REVIEW.md
+│   ├── REPOSITORY_REVIEW.md
+│   ├── RELEASE_1.4.0.md
+│   ├── STORE_LISTING.md
+│   ├── PUBLISHING.md
+│   ├── PRIVACY_POLICY.md
+│   ├── dynamics-365-form-debugger-banner.jpg
+│   └── design/
+├── Screenshots/
 ├── LICENSE
 └── README.md
 ```

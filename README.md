@@ -114,7 +114,7 @@ Behavior changes should also be tested by loading `Chrome-Edge/` as an unpacked 
 
 ## Release Materials
 
-Version 1.4.0 metadata, store descriptions, and artwork are prepared locally. See [store listing copy](docs/STORE_LISTING.md) and the [release audit](docs/RELEASE_1.4.0.md) for package contents, verification, and remaining browser checks. Preparing these files does not publish an update to either browser store.
+Version 1.4.0 metadata, store descriptions, and artwork are prepared locally. See [store listing copy](docs/STORE_LISTING.md), the [release audit](docs/RELEASE_1.4.0.md), and the [publication handoff](docs/PUBLISHING.md) for package contents, verification, and remaining browser checks. The [prepared privacy policy](docs/PRIVACY_POLICY.md) must also match the public policy used by the stores. Preparing these files does not publish an update to either browser store.
 
 ## Changelog
 

@@ -46,6 +46,28 @@ Only the enabled/disabled preference is persisted in `chrome.storage.local`. Ope
 
 No additional permissions, remote code, or data collection were introduced for 1.4.0. Broad content-script site access remains an existing store-review consideration.
 
+## Dashboard fields
+
+**Single purpose:** Inspect and test Dynamics 365 Customer Insights - Journeys forms by identifying Form IDs, exposing hidden fields for local editing, and setting the supported form-cache bypass marker.
+
+| Field | Prepared value |
+| --- | --- |
+| Category | Developer Tools |
+| Website | `https://mylokaye.me` |
+| Support | `https://mylokaye.me` |
+| Privacy policy | `https://mylokaye.me/privacy.html` after aligning the public page with `PRIVACY_POLICY.md` |
+| Remote code | No remote code; executable scripts are bundled in the extension |
+
+**`activeTab` justification:** When the user opens the popup, it reads the active tab's URL to report cache-marker status and requests the detected Form ID from the already registered content script. It does not retain the tab URL or browsing history.
+
+**`storage` justification:** The extension stores one local boolean preference, `extensionEnabled`, so enabled/disabled behavior persists across page reloads and browser sessions. Form data is not stored.
+
+**Dynamics host access justification:** The service worker must read supported Marketing-domain tab URLs during navigation and reload so it can add or remove the cache-bypass marker automatically. The existing `*://*.dynamics.com/*` permission is retained; runtime URL changes are limited to HTTPS `mkt.dynamics.com` and its subdomains. `activeTab` alone would require opening the popup on each page and would not provide the existing automatic workflow.
+
+**`<all_urls>` content-script justification:** Dynamics forms are embedded by script on customer-controlled websites with arbitrary domains. The registered content script needs to recognize these forms when the page loads and render hidden-field debug copies without requiring the popup to be opened first. Inspection is scoped to the first detected Dynamics form container. Restricting injection to Microsoft domains would exclude this supported workflow. The script does not collect page content, retain browsing history, or send form data to an extension service.
+
+The prepared privacy policy is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md). Reviewers can use [PUBLISHING.md](PUBLISHING.md) for the manual verification steps. The publisher must complete the store's data-use declarations consistently with the described local processing and certify the declarations in the dashboard.
+
 ## Artwork
 
 | File | Purpose | Dimensions |
