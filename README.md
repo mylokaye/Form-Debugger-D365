@@ -62,7 +62,7 @@ The extension does not collect, store, or transmit form values, browsing history
 - Hidden-field values and edits remain in the current page session.
 - Edited values may be transmitted by the host website only when you submit its form.
 - The extension stores only the enabled/disabled preference locally through `chrome.storage.local`; it does not persist form data.
-- Selecting the popup's information button opens the external [support website](https://mylokaye.info).
+- Selecting the popup's information button opens the external [support website](https://mylokaye.me).
 
 ## Permissions and Site Access
 
