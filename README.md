@@ -1,4 +1,4 @@
-![Form Debugger Extension by Mylo Kaye](docs/readme-banner.jpg)
+![Dynamics 365 Form Debugger — browser extension by Mylo Kaye](docs/dynamics-365-form-debugger-banner.jpg)
 
 # Form Debugger for Dynamics 365 
 
