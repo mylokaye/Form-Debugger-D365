@@ -112,6 +112,10 @@ node --check Chrome-Edge/popup.js
 
 Behavior changes should also be tested by loading `Chrome-Edge/` as an unpacked extension and exercising standalone, embedded, dynamically inserted, normal, and restricted pages.
 
+## Release Materials
+
+Version 1.4.0 metadata, store descriptions, and artwork are prepared locally. See [store listing copy](docs/STORE_LISTING.md) and the [release audit](docs/RELEASE_1.4.0.md) for package contents, verification, and remaining browser checks. Preparing these files does not publish an update to either browser store.
+
 ## Changelog
 
 ### [1.4.0] - 2026-10-01
@@ -145,7 +149,7 @@ Behavior changes should also be tested by loading `Chrome-Edge/` as an unpacked 
 - Updated privacy and permissions documentation to match current behavior.
 - Added native Chrome localization for English, Spanish, German, Japanese, French, Portuguese, Russian, Italian, Dutch, and Polish.
 
-### [1.0.0] - 2025-01-XX
+### [1.0.0] - Initial release
 
 - Added Dynamics Form ID and field-count detection.
 - Added click-to-copy form details.

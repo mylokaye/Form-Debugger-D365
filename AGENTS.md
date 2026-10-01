@@ -12,13 +12,15 @@ The shipped extension lives in `Chrome-Edge/` and currently uses Manifest V3 wit
 
 - `Chrome-Edge/manifest.json`: Manifest V3 entry point, permissions, content-script registration, action, service worker, and icons.
 - `Chrome-Edge/config.js`: shared constants exposed through the global `CONFIG` object.
-- `Chrome-Edge/background.js`: service worker that watches Dynamics asset-tab URL changes and adds the no-cache hash.
+- `Chrome-Edge/background.js`: service worker that watches supported Marketing-domain tab URLs and manages the no-cache hash.
 - `Chrome-Edge/content-script.js`: page-side form detection, resource observation, mutation observation, and popup messaging.
 - `Chrome-Edge/popup.html`: popup markup and styles.
 - `Chrome-Edge/popup.js`: popup state, active-tab messaging, copy actions, and support links.
 - `Chrome-Edge/icons/`: packaged extension artwork.
 - `README.md`: user-facing installation, behavior, privacy, and release information.
 - `docs/REPOSITORY_REVIEW.md`: current architecture review, known gaps, and development priorities.
+- `docs/STORE_LISTING.md`: current store description, permission copy, and artwork inventory.
+- `docs/RELEASE_1.4.0.md`: version 1.4.0 package audit and verification boundaries.
 
 ## Current Runtime Flow
 

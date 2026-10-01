@@ -1,6 +1,6 @@
 # Repository Review
 
-Reviewed on 7 August 2026; cache-bypass scope and status updated on 1 October 2026. This document describes the repository as found; it is not a promise that every current behavior is intentional.
+Reviewed on 7 August 2026; cache-bypass behavior and release materials reviewed again on 1 October 2026. This document describes the repository as found; it is not a promise that every current behavior is intentional.
 
 ## Executive Summary
 
@@ -53,7 +53,7 @@ Although `host_permissions` is limited to Dynamics domains, the `<all_urls>` con
 
 ### Shared Configuration
 
-`config.js` defines the global `CONFIG` object. It contains DOM IDs, timeouts, logging styles, support URLs, the Marketing domain and URL helpers, the no-cache hash, localized cache-status states, selectors, message types, the feature state storage key, and its enabled-by-default value.
+`config.js` defines the global `CONFIG` object. It contains DOM IDs, logging styles, support URLs, the Marketing domain and URL helpers, the no-cache hash, localized cache-status states, selectors, message types, the feature state storage key, and its enabled-by-default value.
 
 Unused overlay-era IDs, timeout/style constants, and comments were removed during the 1.4.0 release pass. The CommonJS export branch supports local validation and is not used by the extension. Runtime message types are shared through `CONFIG.MESSAGE_TYPES`.
 
@@ -173,6 +173,6 @@ These checks catch only parse and syntax errors. Behavioral changes still requir
 ### Cache-bypass verification on 1 October 2026
 
 - Passed manifest parsing, all four runtime JavaScript syntax checks, all eleven locale catalogs and required status messages, and packaged-file reference checks.
-- Passed 43 targeted checks against the actual background and popup sources with simulated Chrome APIs: supported and excluded hosts, fragment/query handling, duplicate-marker avoidance, enabled/disabled state, tab navigation, missing receivers, storage and tab-update failures, clipboard success/failure, and the unchanged support destination.
+- Passed 44 targeted checks against the actual background and popup sources with simulated Chrome APIs: supported and excluded hosts, fragment/query handling, duplicate-marker avoidance, enabled/disabled state, tab navigation, missing receivers, storage and tab-update failures, clipboard success/failure, the unchanged support destination, and the popup's manifest-derived 1.4.0 version.
 - In Chrome, verified the actual popup HTML/CSS and runtime scripts using a local browser-API fixture. The badge changed from inactive to set when the background source handled a simulated page load, followed ordinary/restricted/unavailable page states, and changed with the feature toggle. Keyboard focus was visible on the toggle and Form ID button. The 400-pixel popup and all eleven localized set-state badges fit without panel overflow or overlap. No warnings or errors were captured in the fixture page console.
 - The updated source has not yet been loaded as an unpacked extension: browser-control policy blocked access to extension management. Actual service-worker and extension-popup consoles, updated live-form behavior, popup reopening after browser restart, late form insertion, embedded/iframe forms, real clipboard operations, and the external support page still need the unpacked-extension check. Fixture verification is not a substitute for that check.
