@@ -4,20 +4,13 @@
 importScripts('config.js');
 
 /**
- * Regular expression to match Dynamics 365 Marketing form asset URLs.
- * Matches URLs like: https://assets-gbr.mkt.dynamics.com/...
- * @type {RegExp}
- */
-const dynamicsRegex = CONFIG.PATTERNS.DYNAMICS_URL;
-
-/**
- * Listens for tab URL updates and applies cache bypass for Dynamics 365 form pages
+ * Listens for tab URL updates and applies cache bypass on the Marketing domain
  * while the extension is enabled. The loading event also covers a normal refresh
  * where Chrome does not provide a new URL in changeInfo.
  */
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   const url = changeInfo.url || (changeInfo.status === 'loading' ? tab?.url : null);
-  if (typeof url !== 'string' || !dynamicsRegex.test(url)) return;
+  if (!CONFIG.isDynamicsMarketingUrl(url)) return;
 
   readExtensionEnabled((enabled) => {
     if (enabled) {
@@ -61,11 +54,13 @@ function readExtensionEnabled(callback) {
  * @returns {void}
  */
 function applyNoCache(tabId, url) {
-  if (url.includes(CONFIG.CACHE_BYPASS.URL_HASH)) {
+  if (CONFIG.hasCacheBypass(url)) {
     return;
   }
 
-  chrome.tabs.update(tabId, { url: url + CONFIG.CACHE_BYPASS.URL_HASH }, () => {
+  const targetUrl = new URL(url);
+  targetUrl.hash += CONFIG.CACHE_BYPASS.URL_HASH;
+  chrome.tabs.update(tabId, { url: targetUrl.href }, () => {
     if (chrome.runtime.lastError) {
       console.error(
         `%c${CONFIG.LOGGING.PREFIX}%c Cache bypass could not be applied. ${chrome.runtime.lastError.message}`,
@@ -91,10 +86,11 @@ function applyNoCache(tabId, url) {
  * @returns {void}
  */
 function removeNoCache(tabId, url) {
-  if (!url.endsWith(CONFIG.CACHE_BYPASS.URL_HASH)) return;
+  const targetUrl = new URL(url);
+  if (!targetUrl.hash.endsWith(CONFIG.CACHE_BYPASS.URL_HASH)) return;
 
-  const cleanUrl = url.slice(0, -CONFIG.CACHE_BYPASS.URL_HASH.length);
-  chrome.tabs.update(tabId, { url: cleanUrl }, () => {
+  targetUrl.hash = targetUrl.hash.slice(0, -CONFIG.CACHE_BYPASS.URL_HASH.length);
+  chrome.tabs.update(tabId, { url: targetUrl.href }, () => {
     if (chrome.runtime.lastError) {
       console.error(
         `%c${CONFIG.LOGGING.PREFIX}%c Cache bypass could not be removed. ${chrome.runtime.lastError.message}`,

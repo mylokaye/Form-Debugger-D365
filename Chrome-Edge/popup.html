@@ -85,9 +85,9 @@
     }
 
     .cache-status {
-      width: 90px;
+      min-width: 90px;
       height: 26px;
-      padding: 0;
+      padding: 0 10px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -294,8 +294,8 @@
 
     <section class="details-panel" id="extension-details" aria-label="Extension details">
       <div class="panel-header">
-        <div class="cache-status" id="cache-status" role="status">Cache disabled</div>
-        <button class="info-button" id="extension-info" type="button" title="Open support" aria-label="Open extension support">
+        <div class="cache-status is-disabled" id="cache-status" role="status">Checking cache…</div>
+        <button class="info-button" id="extension-info" type="button" title="Open support" aria-label="Open support">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="9"></circle>
             <path d="M12 10.8v6"></path>
@@ -308,7 +308,7 @@
         <span class="extension-toggle-label" id="extension-toggle-label">Extension features</span>
         <div class="extension-toggle-control">
           <span class="extension-toggle-state" id="extension-toggle-state" role="status">Enabled</span>
-          <label class="switch" title="Enable extension features">
+          <label class="switch">
             <input id="extension-toggle" type="checkbox" aria-labelledby="extension-toggle-label" aria-describedby="extension-toggle-state" checked>
             <span class="switch-track" aria-hidden="true"></span>
           </label>

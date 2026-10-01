@@ -1,10 +1,10 @@
 ![Dynamics 365 Form Debugger — browser extension by Mylo Kaye](docs/dynamics-365-form-debugger-banner.jpg)
 
-# Form Debugger for Dynamics 365 
+# Dynamics 365 Form Debugger
 
 A dependency-free Chrome and Microsoft Edge extension for debugging **Dynamics 365 Customer Insights - Journeys forms**.
 
-It automatically applies the `#d365mkt-nocache` cache-bypass hash on supported Dynamics asset URLs, identifies the active Form ID, and exposes hidden form fields for submission testing.
+It automatically applies the `#d365mkt-nocache` cache-bypass hash on HTTPS pages at `mkt.dynamics.com` and any of its subdomains, identifies the active Form ID, and exposes hidden form fields for submission testing.
 
 ## Installation
 
@@ -22,29 +22,34 @@ For local development:
 
 ## Features
 
-- **Automatic cache bypass** — Adds `#d365mkt-nocache` to supported `assets-*.mkt.dynamics.com` form URLs.
+- **Automatic cache bypass** — Adds `#d365mkt-nocache` on HTTPS pages at `mkt.dynamics.com` and every subdomain, including numbered hosts such as `assets1-gbr.mkt.dynamics.com`.
+- **Accurate cache status** — The popup reports whether the current supported page has the bypass marker, whether bypass is inactive, or whether the page is outside the automatic bypass scope.
 - **Form ID detection** — Displays the detected Dynamics Form ID in the popup and copies it on click.
 - **Editable hidden fields** — Renders hidden fields in their original form layout with a green debug border.
-- **Complete Dynamics field support** — Handles native hidden inputs and designer-hidden `input`, `select`, and `textarea` controls.
+- **Hidden field support** — Handles native hidden inputs and designer-hidden `input`, `select`, and `textarea` controls in the detected Dynamics form.
 - **Submission testing** — Synchronizes edits to the original source controls and dispatches normal `input` and `change` events.
 - **Dynamic form support** — Labels newly inserted hidden fields without creating duplicates.
 - **Feature toggle** — Enables or disables the extension's page features, stores that preference locally, and refreshes the active page when possible after a change.
 - **Compact popup** — Uses a 400 × 260px layout with the extension logo, feature toggle, cache status, Form ID, installed version, and support link.
 - **Consistent diagnostics** — Uses the **Dynamics 365 Form Debugger** console prefix with blue branding and clear black message text.
-- **Localized interface** — Supports the ten most-used web content languages through Chrome's native locale system.
+- **Localized interface** — Supports ten languages through eleven native Chrome locale catalogs.
 - **No runtime dependencies or telemetry** — Uses browser APIs and plain HTML, CSS, and JavaScript only.
 
 ## How It Works
 
-1. Open a supported Dynamics standalone form or a page containing an embedded Dynamics form.
+1. Open a supported Dynamics standalone form or a page with a Dynamics form embedded by script.
 2. The extension detects the form and automatically displays editable copies of its hidden fields.
 3. Hidden-field copies use the form's existing styles and a green border so they are easy to distinguish.
 4. Editing a displayed copy updates the corresponding original control used by the form submission.
-5. On supported Dynamics asset pages, cache bypass is applied automatically while the extension is enabled.
+5. On HTTPS pages at `mkt.dynamics.com` or any subdomain, cache bypass is applied automatically while the extension is enabled. Query parameters are preserved. If a fragment already exists, the marker is appended to it; disabling the extension removes a trailing bypass marker and preserves the earlier fragment.
 6. Use the popup's **Extension features** toggle to pause or resume cache bypass, form detection, field rendering, and diagnostics. The active page is refreshed when the browser allows it.
 7. Open the extension popup to view or copy the Form ID, confirm cache status, view the installed version, or open support.
 
 Reload the extension and refresh existing form tabs after installing a local update so the latest content script is injected.
+
+The popup's **Cache bypass set** badge confirms the marker is present in the current supported URL. It does not measure network cache behavior. The Dynamics form loader uses this marker to request an uncached form; it does not disable all browser caching. Third-party pages can still be inspected for embedded forms, but their URLs are not changed automatically.
+
+Inspection uses the first detected Dynamics form container in the top-level page. Cross-origin iframe forms are not inspected through their host page; open the form's standalone Dynamics URL to inspect it directly. Browser-internal pages cannot run the content script. A missing Form ID is shown as `---` and can also mean that the content script is unavailable.
 
 ## Hidden-Field Editing
 
@@ -68,14 +73,14 @@ The extension does not collect, store, or transmit form values, browsing history
 
 - **`activeTab`** — Allows the popup to request the detected Form ID from the current tab.
 - **`storage`** — Stores the user's enabled/disabled preference locally so the toggle applies across page reloads and browser sessions.
-- **`*://*.dynamics.com/*` host access** — Allows the service worker to apply cache bypass on supported Dynamics asset URLs.
+- **`*://*.dynamics.com/*` host access** — Allows the service worker to read supported tab URLs and apply cache bypass. Automatic URL changes are limited to HTTPS pages at `mkt.dynamics.com` and its subdomains; other Dynamics domains and third-party sites are left untouched.
 - **`<all_urls>` content-script access** — Allows detection when Dynamics forms are embedded on third-party websites. The content script limits field inspection to detected Dynamics form containers.
 
 The extension does not collect or transmit the locally stored preference.
 
 ## Supported Languages
 
-The manifest and popup are localized for the ten most-used website content languages reported by [W3Techs on 22 June 2026](https://w3techs.com/technologies/overview/content_language):
+The manifest and popup support these ten languages:
 
 - English
 - Spanish
@@ -108,6 +113,14 @@ node --check Chrome-Edge/popup.js
 Behavior changes should also be tested by loading `Chrome-Edge/` as an unpacked extension and exercising standalone, embedded, dynamically inserted, normal, and restricted pages.
 
 ## Changelog
+
+### [1.4.0] - 2026-10-01
+
+- Support automatic cache bypass on `mkt.dynamics.com` and all HTTPS subdomains, including numbered regional asset hosts.
+- Report the current URL's bypass marker in the popup instead of assuming cache bypass from the feature toggle.
+- Preserve query parameters and existing fragment text when adding or removing the trailing bypass marker.
+- Refresh localized descriptions, store artwork, screenshots, and release documentation for version 1.4.0.
+- Document top-level form inspection, iframe limitations, and the meaning of the cache-status badge.
 
 ### [1.3.0] - 2026-08-07
 
@@ -150,4 +163,4 @@ Visit [mylokaye.me](https://mylokaye.me) for support and feedback.
 
 - **Author:** Mylo Kaye
 - **License:** Apache 2.0
-- **Version:** 1.3.0
+- **Version:** 1.4.0

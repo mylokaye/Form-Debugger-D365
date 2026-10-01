@@ -1,12 +1,12 @@
 # Repository Review
 
-Reviewed on 7 August 2026. This document describes the repository as found; it is not a promise that every current behavior is intentional.
+Reviewed on 7 August 2026; cache-bypass scope and status updated on 1 October 2026. This document describes the repository as found; it is not a promise that every current behavior is intentional.
 
 ## Executive Summary
 
 The repository contains a small, readable, dependency-free Manifest V3 extension for Chrome and Edge. Its source is directly loadable from `Chrome-Edge/`; there is no compilation or packaging step. The implementation is split sensibly between a service worker, a content script, a popup, and shared constants.
 
-The extension automatically renders editable hidden-field copies and applies cache bypass while its persisted feature toggle is enabled. Form detection and permissions still need deliberate review because the extension supports forms embedded on arbitrary sites while its background URL handling is limited to Dynamics asset pages.
+The extension automatically renders editable hidden-field copies and applies cache bypass while its persisted feature toggle is enabled. Form detection and permissions still need deliberate review because the extension supports forms embedded on arbitrary sites while its background URL handling is limited to HTTPS pages at `mkt.dynamics.com` and its subdomains.
 
 ## Current Structure
 
@@ -32,7 +32,7 @@ The extension automatically renders editable hidden-field copies and applies cac
 └── README.md
 ```
 
-The manifest and README use version `1.3.0`. The declared action icons are 16, 48, and 128 pixels. The popup also uses the packaged 300-pixel icon for its centered brand mark.
+The manifest and README use version `1.4.0`. The declared action icons are 16, 48, and 128 pixels. The popup also uses the packaged 300-pixel icon for its centered brand mark. Store images under `Screenshots/` show the current branding and 1.4.0 interface; historical concept artwork under `docs/design/` is excluded from the extension package.
 
 ## Architecture
 
@@ -53,19 +53,15 @@ Although `host_permissions` is limited to Dynamics domains, the `<all_urls>` con
 
 ### Shared Configuration
 
-`config.js` defines the global `CONFIG` object. It contains DOM IDs, timeouts, logging styles, support URLs, the Dynamics asset URL pattern, the no-cache hash, selectors, message types, the feature state storage key, and its enabled-by-default value.
+`config.js` defines the global `CONFIG` object. It contains DOM IDs, timeouts, logging styles, support URLs, the Marketing domain and URL helpers, the no-cache hash, localized cache-status states, selectors, message types, the feature state storage key, and its enabled-by-default value.
 
-Several values are remnants of a removed in-page overlay (`STYLE`, `OVERLAY`, `OVERLAY_Z_INDEX`, and related IDs). The CommonJS export branch is not used by the extension. Runtime message types are shared through `CONFIG.MESSAGE_TYPES`.
+Unused overlay-era IDs, timeout/style constants, and comments were removed during the 1.4.0 release pass. The CommonJS export branch supports local validation and is not used by the extension. Runtime message types are shared through `CONFIG.MESSAGE_TYPES`.
 
 ### Background Service Worker
 
-`background.js` imports `config.js` with `importScripts`, listens to `chrome.tabs.onUpdated`, reads the persisted feature state, and filters changed or refreshed tab URLs using:
+`background.js` imports `config.js` with `importScripts`, listens to `chrome.tabs.onUpdated`, reads the persisted feature state, and parses changed or refreshed tab URLs with the Web `URL` API. It accepts HTTPS URLs whose hostname is exactly `mkt.dynamics.com` or ends in `.mkt.dynamics.com`. Numbered and nested subdomains are supported; lookalike domains and other Dynamics domains are excluded.
 
-```text
-^https://assets-[a-z]{3}.mkt.dynamics.com/
-```
-
-For a matching URL, it appends `#d365mkt-nocache` when the hash is not already present and the extension is enabled. It skips cache bypass while the extension is disabled.
+For a matching URL, it appends `#d365mkt-nocache` to the fragment when the Dynamics marker is absent and the extension is enabled. Query parameters and any earlier fragment text are preserved. While disabled, it removes only a trailing bypass marker.
 
 Tab-update callback errors are handled.
 
@@ -89,7 +85,7 @@ It does not transmit detected data. When disabled, it does not start the resourc
 `popup.html` contains all popup markup and CSS. `popup.js`:
 
 - Queries the active tab and requests form information from its content script.
-- Shows the feature toggle, Form ID, cache-bypass status, and installed version in a compact branded panel.
+- Shows the feature toggle, Form ID, cache-bypass status, and installed version in a compact branded panel. Cache status checks the supported active-tab URL and updates when that tab navigates; it does not infer cache bypass from the toggle or claim to measure network caching.
 - Persists the feature toggle in `chrome.storage.local` and refreshes the active tab after a successful change when possible.
 - Copies the Form ID to the clipboard.
 - Opens the support page from the popup information button.
@@ -107,15 +103,13 @@ The extension persists one local boolean preference, `extensionEnabled`, default
 
 1. **No-form and unavailable-content-script states are conflated.** A restricted URL, injection failure, or extension-update mismatch is displayed as though a normal page had no form.
 2. **Broad page access needs confirmation.** `<all_urls>` supports embedded forms on arbitrary sites, but it is a substantial permission surface. Confirm whether optional host access, user-triggered injection, or narrower matching can preserve the intended flow.
-3. **Hash handling is string-based.** Appending the bypass hash to a URL that already has another fragment creates a concatenated fragment. Removing the substring can also leave an unintended fragment. Use the `URL` API once desired behavior for existing hashes is specified.
-4. **The URL pattern is narrow.** It permits exactly three letters after `assets-`. Confirm all current Dynamics regional asset host formats before relying on it.
+3. **Embedded-page bypass is manual.** The popup reports automatic bypass as not applicable on third-party hosts. Inspection and hidden-field rendering still work there, but automatic URL changes remain limited to the Marketing domain.
 
 ### Maintenance and documentation
 
-1. Overlay-era constants and comments remain after overlay removal.
-2. The field-count observer attaches only when a form container exists at its DOM-ready initialization; hidden-field rendering has its own document-level observer and does handle late insertion.
-3. There is no automated validation, test suite, linting, or release packaging script.
-4. `.gitignore` ignores common package-manager lockfiles. If Node tooling is introduced, its chosen lockfile should be committed for reproducibility.
+1. The field-count observer attaches only when a form container exists at its DOM-ready initialization; hidden-field rendering has its own document-level observer and does handle late insertion.
+2. There is no committed automated validation, test suite, linting, or release packaging script; release checks currently run without adding runtime tooling.
+3. `.gitignore` ignores common package-manager lockfiles. If Node tooling is introduced, its chosen lockfile should be committed for reproducibility.
 
 ## What Is Already Good
 
@@ -156,6 +150,12 @@ extension/
 
 Until then, the current flat `Chrome-Edge/` structure is proportionate. A premature framework migration would add more maintenance than value.
 
+## API findings for the cache-bypass fix
+
+Context7 was unavailable in the session. Official [Chrome Tabs API documentation](https://developer.chrome.com/docs/extensions/reference/api/tabs) confirms that existing host permissions expose matching tab URLs, `activeTab` permits reading the invoked tab, and tab URL changes and refreshes use `tabs.update` and `tabs.reload` without an added `tabs` permission. [Match-pattern documentation](https://developer.chrome.com/docs/extensions/develop/concepts/match-patterns) confirms that the existing Dynamics wildcard covers Marketing subdomains. No manifest permission or content-script match changes were required.
+
+Microsoft documents the marker in [Deploy pages that contain Customer Insights - Journeys forms](https://learn.microsoft.com/en-us/dynamics365/customer-insights/journeys/real-time-marketing-deploy-pages). The live page's [Dynamics form loader](https://formui-usa1.mkt.dynamics.com/gbr/FormLoader/FormLoader.bundle.js), inspected on 1 October 2026, checks whether `window.location.hash` contains `d365mkt-nocache`. The shared marker check follows that behavior and ignores a similarly named query parameter.
+
 ## Current Validation Baseline
 
 With no project test runner, the minimum non-browser validation is:
@@ -169,3 +169,10 @@ node --check Chrome-Edge/popup.js
 ```
 
 These checks catch only parse and syntax errors. Behavioral changes still require loading `Chrome-Edge/` as an unpacked extension and testing the service worker, content script, and popup together.
+
+### Cache-bypass verification on 1 October 2026
+
+- Passed manifest parsing, all four runtime JavaScript syntax checks, all eleven locale catalogs and required status messages, and packaged-file reference checks.
+- Passed 43 targeted checks against the actual background and popup sources with simulated Chrome APIs: supported and excluded hosts, fragment/query handling, duplicate-marker avoidance, enabled/disabled state, tab navigation, missing receivers, storage and tab-update failures, clipboard success/failure, and the unchanged support destination.
+- In Chrome, verified the actual popup HTML/CSS and runtime scripts using a local browser-API fixture. The badge changed from inactive to set when the background source handled a simulated page load, followed ordinary/restricted/unavailable page states, and changed with the feature toggle. Keyboard focus was visible on the toggle and Form ID button. The 400-pixel popup and all eleven localized set-state badges fit without panel overflow or overlap. No warnings or errors were captured in the fixture page console.
+- The updated source has not yet been loaded as an unpacked extension: browser-control policy blocked access to extension management. Actual service-worker and extension-popup consoles, updated live-form behavior, popup reopening after browser restart, late form insertion, embedded/iframe forms, real clipboard operations, and the external support page still need the unpacked-extension check. Fixture verification is not a substitute for that check.

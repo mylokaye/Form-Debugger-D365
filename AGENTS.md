@@ -25,10 +25,10 @@ The shipped extension lives in `Chrome-Edge/` and currently uses Manifest V3 wit
 1. Chrome injects `config.js` and `content-script.js` into matching pages at `document_start`.
 2. The content script checks `[data-form-id]` metadata separately from field controls, observes resource entries and nested form mutations, and responds to `GET_FORM_INFO`.
 3. Opening the popup queries the active tab and sends `GET_FORM_INFO` to its content script.
-4. The popup renders the detected form state and reports that cache bypass is active; it has no activation control or persisted activation state.
-5. The background service worker listens to `chrome.tabs.onUpdated` and adds the no-cache hash to matching Dynamics asset URLs.
+4. The popup renders the detected Form ID, the persisted Extension features toggle, and cache status based on the supported active-tab URL's fragment.
+5. The background service worker listens to `chrome.tabs.onUpdated` and adds the no-cache hash on HTTPS pages at `mkt.dynamics.com` or any subdomain while the extension is enabled. It removes a trailing bypass marker while disabled.
 
-The extension is intentionally always active on supported Dynamics form URLs. Adding an activation or cache preference requires an explicit product decision, a storage migration plan, and updated permissions documentation.
+The extension defaults to enabled and stores only the `extensionEnabled` preference locally. Changes to this preference's meaning, or additional persisted preferences, require an explicit product decision, a migration plan, and updated permissions documentation.
 
 ## Documentation
 
@@ -91,8 +91,8 @@ Do not claim that no data is stored when preferences are stored locally. Disting
 
 ## State and Messaging Rules
 
-- The extension currently has no persisted runtime state and does not require the `storage` permission.
-- Do not introduce persisted activation or cache state without an explicit product requirement and migration plan.
+- The extension requires the `storage` permission for its existing local `extensionEnabled` boolean, defaulting to `true`.
+- Do not introduce additional persisted activation or cache state, or repurpose the existing key, without an explicit product requirement and migration plan.
 - Storage writes must handle failures and leave the UI consistent with the persisted state. If a write fails, revert optimistic UI state or show an error.
 - Messages must use constants from `CONFIG.MESSAGE_TYPES` and return a documented response shape.
 - Only return `true` from `chrome.runtime.onMessage` when a response will actually be sent asynchronously.
@@ -141,7 +141,7 @@ At minimum, test:
 - A supported page before the form is inserted, followed by late form insertion.
 - A normal website with no form.
 - A Dynamics form embedded in a non-Dynamics host page, when that flow is in scope.
-- Always-active cache bypass, including a URL that already has a hash or query string.
+- Enabled and disabled cache bypass, including a URL that already has a hash or query string.
 - Popup reopening after navigation and after a browser restart.
 - Missing content-script receiver, such as a restricted browser page.
 - Copy-to-clipboard success and failure.

@@ -3,8 +3,6 @@
 // Config is loaded from config.js (loaded first in manifest.json)
 // Access configuration via the global CONFIG object
 
-const STYLE_ID = CONFIG.ELEMENT_IDS.STYLE;
-const OVERLAY_ID = CONFIG.ELEMENT_IDS.OVERLAY;
 const HIDDEN_FIELDS_STYLE_ID = CONFIG.ELEMENT_IDS.HIDDEN_FIELDS_STYLE;
 const hiddenFieldLabels = new Map();
 let hiddenFieldsEnabled = false;
@@ -585,12 +583,6 @@ function monitorFormMutations() {
 
   writeLog('log', 'Dynamic field monitoring started.');
 }
-
-// Overlay functionality removed - all UI now handled by popup
-
-// ensureOverlay function removed - overlay no longer displayed on page
-
-// updateOverlayStatus function removed - overlay no longer displayed on page
 
 /**
  * Update running content-script features when the popup changes the state.

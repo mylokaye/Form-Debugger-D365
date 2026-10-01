@@ -5,8 +5,8 @@
  * throughout the extension. Centralizing these values makes the code more maintainable
  * and easier to modify.
  *
- * Note: This file uses a global CONFIG object instead of ES6 exports because content
- * scripts cannot use ES6 modules in browser extensions.
+ * The content script, popup, and classic service worker share this configuration
+ * through a classic script; there is no module build step.
  */
 
 // Define all configuration in a global CONFIG object
@@ -17,30 +17,7 @@ const CONFIG = {};
  * @const {Object}
  */
 CONFIG.ELEMENT_IDS = {
-  STYLE: "d365-forms-tester-style",
-  OVERLAY: "d365-forms-tester-overlay",
-  FORM_BADGE: "form-badge",
-  CACHE_BADGE: "cache-badge",
-  FORM_INFO: "form-info",
   HIDDEN_FIELDS_STYLE: "d365-debug-hidden-fields-style"
-};
-
-/**
- * Timeout values in milliseconds
- * @const {Object}
- */
-CONFIG.TIMEOUTS = {
-  /** Retry delay when waiting for DOM elements to be available */
-  DOM_RETRY: 100
-};
-
-/**
- * UI styling constants
- * @const {Object}
- */
-CONFIG.STYLES = {
-  /** Z-index for overlay to ensure it appears above all other page content */
-  OVERLAY_Z_INDEX: 999999
 };
 
 /**
@@ -57,25 +34,48 @@ CONFIG.LOGGING = {
 };
 
 /**
- * Regular expression patterns
- * @const {Object}
- */
-CONFIG.PATTERNS = {
-  /**
-   * Matches Dynamics 365 Marketing form asset URLs
-   * Examples: https://assets-gbr.mkt.dynamics.com/...
-   *           https://assets-usa.mkt.dynamics.com/...
-   */
-  DYNAMICS_URL: /^https:\/\/assets-[a-z]{3}\.mkt\.dynamics\.com\//i
-};
-
-/**
  * Cache bypass configuration
  * @const {Object}
  */
 CONFIG.CACHE_BYPASS = {
+  /** Exact Marketing domain and all of its subdomains */
+  DOMAIN: "mkt.dynamics.com",
   /** URL hash used to disable Dynamics 365 form caching */
   URL_HASH: "#d365mkt-nocache"
+};
+
+/** Returns whether a URL belongs to the supported HTTPS Marketing domain. */
+CONFIG.isDynamicsMarketingUrl = function (url) {
+  if (typeof url !== "string") return false;
+
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === "https:"
+      && (parsedUrl.hostname === CONFIG.CACHE_BYPASS.DOMAIN
+        || parsedUrl.hostname.endsWith(`.${CONFIG.CACHE_BYPASS.DOMAIN}`));
+  } catch {
+    return false;
+  }
+};
+
+/** Mirrors the Dynamics form loader's check of the fragment, not the query. */
+CONFIG.hasCacheBypass = function (url) {
+  if (typeof url !== "string") return false;
+
+  try {
+    return new URL(url).hash.includes(CONFIG.CACHE_BYPASS.URL_HASH.slice(1));
+  } catch {
+    return false;
+  }
+};
+
+CONFIG.CACHE_STATUS = {
+  CHECKING: { message: "cacheChecking", fallback: "Checking cache…" },
+  SET: { message: "cacheBypassSet", fallback: "Cache bypass set" },
+  INACTIVE: { message: "cacheBypassInactive", fallback: "Bypass inactive" },
+  NOT_APPLICABLE: { message: "cacheNotApplicable", fallback: "Not applicable" },
+  UNAVAILABLE: { message: "cacheStatusUnavailable", fallback: "Status unavailable" },
+  DISABLED: { message: "extensionDisabled", fallback: "Extension disabled" }
 };
 
 CONFIG.URLS = {
@@ -112,9 +112,7 @@ CONFIG.SELECTORS = {
   /** Native hidden inputs and controls inside Dynamics field-block wrappers */
   HIDDEN_FIELD_CANDIDATES: "input[type='hidden'], [class*='FormFieldBlock'] input, [class*='FormFieldBlock'] select, [class*='FormFieldBlock'] textarea",
   /** Dynamics wraps form-designer hidden fields in a non-rendered field block */
-  DYNAMICS_FIELD_BLOCK: "[class*='FormFieldBlock']",
-  /** All script tags with src attributes */
-  SCRIPTS: "script[src]"
+  DYNAMICS_FIELD_BLOCK: "[class*='FormFieldBlock']"
 };
 
 /**
@@ -130,13 +128,12 @@ CONFIG.HIDDEN_FIELD_DEBUG = {
   MARKER_ATTRIBUTE: "data-d365-debug-hidden-field"
 };
 
-// Make CONFIG available globally (for content scripts)
-// and also export it for modules (background.js, popup.js)
+// Allow dependency-free local validation to read the same configuration.
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = CONFIG;
 }
 
-// For ES6 modules (background.js with type="module")
+// Expose the shared configuration to extension-page scripts.
 if (typeof window !== 'undefined') {
   window.CONFIG = CONFIG;
 }

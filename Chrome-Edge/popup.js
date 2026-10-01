@@ -14,6 +14,8 @@ const extensionToggle = document.getElementById("extension-toggle");
 const extensionToggleLabel = document.getElementById("extension-toggle-label");
 const extensionToggleState = document.getElementById("extension-toggle-state");
 let extensionEnabled = CONFIG.DEFAULTS.EXTENSION_ENABLED;
+let activeTabId = null;
+let activeTabUrl;
 
 /**
  * Returns a localized message with a stable English fallback.
@@ -64,10 +66,29 @@ function updateExtensionStateUI(enabled) {
   extensionToggle.title = enabled
     ? getMessage("disableFeatures", "Disable extension features")
     : getMessage("enableFeatures", "Enable extension features");
-  cacheStatus.textContent = enabled
-    ? getMessage("cacheDisabled", "Cache disabled")
-    : getMessage("extensionDisabled", "Extension disabled");
-  cacheStatus.classList.toggle("is-disabled", !enabled);
+  updateCacheStatusUI();
+}
+
+/** Reports the bypass marker on the current supported tab without assuming success. */
+function updateCacheStatusUI() {
+  let status = CONFIG.CACHE_STATUS.DISABLED;
+
+  if (extensionEnabled) {
+    if (activeTabUrl === undefined) {
+      status = CONFIG.CACHE_STATUS.CHECKING;
+    } else if (typeof activeTabUrl !== "string" || !activeTabUrl) {
+      status = CONFIG.CACHE_STATUS.UNAVAILABLE;
+    } else if (!CONFIG.isDynamicsMarketingUrl(activeTabUrl)) {
+      status = CONFIG.CACHE_STATUS.NOT_APPLICABLE;
+    } else {
+      status = CONFIG.hasCacheBypass(activeTabUrl)
+        ? CONFIG.CACHE_STATUS.SET
+        : CONFIG.CACHE_STATUS.INACTIVE;
+    }
+  }
+
+  cacheStatus.textContent = getMessage(status.message, status.fallback);
+  cacheStatus.classList.toggle("is-disabled", status !== CONFIG.CACHE_STATUS.SET);
 }
 
 /**
@@ -106,13 +127,20 @@ function updateFormId(formId) {
  * Queries the active tab for its detected Dynamics Form ID.
  */
 function queryFormInfo(enabled = extensionEnabled) {
-  if (!enabled) {
-    updateFormId(null);
-    return;
-  }
-
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (chrome.runtime.lastError || !tabs[0] || typeof tabs[0].id !== "number") {
+      activeTabId = null;
+      activeTabUrl = null;
+      updateCacheStatusUI();
+      updateFormId(null);
+      return;
+    }
+
+    activeTabId = tabs[0].id;
+    activeTabUrl = tabs[0].url || null;
+    updateCacheStatusUI();
+
+    if (!enabled) {
       updateFormId(null);
       return;
     }
@@ -127,6 +155,16 @@ function queryFormInfo(enabled = extensionEnabled) {
     });
   });
 }
+
+// Keep the badge current when the service worker adds or removes the marker.
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (tabId !== activeTabId) return;
+  if (!changeInfo.url && changeInfo.status !== "complete") return;
+
+  activeTabUrl = changeInfo.url || tab.url || null;
+  updateCacheStatusUI();
+  if (changeInfo.status === "complete") queryFormInfo();
+});
 
 /**
  * Refreshes the active tab after a successful feature-state change.
