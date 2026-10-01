@@ -95,7 +95,7 @@ It does not transmit detected data. When disabled, it does not start the resourc
 - Opens the support page from the popup information button.
 - Localizes visible popup text with `chrome.i18n.getMessage()` and displays the closest supported browser UI language.
 
-The information button opens the centralized `CONFIG.URLS.SUPPORT` destination at `mylokaye.info`.
+The information button opens the centralized `CONFIG.URLS.SUPPORT` destination at `mylokaye.me`.
 
 ## State Model Found
 
