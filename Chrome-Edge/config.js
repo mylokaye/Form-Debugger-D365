@@ -1,5 +1,5 @@
 /**
- * config.js — Central configuration file for the Dynamics 365 Form Debugger extension
+ * config.js — Central configuration file for the Form Debugger extension
  *
  * This file contains all constants, magic numbers, and configuration values used
  * throughout the extension. Centralizing these values makes the code more maintainable
@@ -26,7 +26,7 @@ CONFIG.ELEMENT_IDS = {
  */
 CONFIG.LOGGING = {
   /** Prefix for all console log messages */
-  PREFIX: "[Dynamics 365 Form Debugger]",
+  PREFIX: "[Form Debugger]",
   /** Blue brand treatment for the plugin name */
   PREFIX_STYLE: "color: #3360C5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; font-weight: 600;",
   /** Matching typography with black diagnostic text */

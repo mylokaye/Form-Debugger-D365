@@ -1,6 +1,6 @@
-![Dynamics 365 Form Debugger — browser extension by Mylo Kaye](docs/dynamics-365-form-debugger-banner.jpg)
+![Form Debugger — browser extension by Mylo Kaye](docs/form-debugger-banner.jpg)
 
-# Dynamics 365 Form Debugger
+# Form Debugger
 
 A dependency-free Chrome and Microsoft Edge extension for debugging **Dynamics 365 Customer Insights - Journeys forms**.
 
@@ -10,8 +10,8 @@ It automatically applies the `#d365mkt-nocache` cache-bypass hash on HTTPS pages
 
 Install the extension from your browser's store:
 
-- **Chrome Web Store:** [Dynamics 365 Form Debugger](https://chromewebstore.google.com/detail/dynamics-365-form-debugge/kdhnliicfgopcijgepghgohnhafphohf)
-- **Microsoft Edge Add-ons:** [Dynamics 365 Form Debugger](https://microsoftedge.microsoft.com/addons/detail/dynamics-365-form-debugge/ceoaoafhphcpdokfdfkiilmndbepbbec)
+- **Chrome Web Store:** [Form Debugger](https://chromewebstore.google.com/detail/dynamics-365-form-debugge/kdhnliicfgopcijgepghgohnhafphohf)
+- **Microsoft Edge Add-ons:** [Form Debugger](https://microsoftedge.microsoft.com/addons/detail/dynamics-365-form-debugge/ceoaoafhphcpdokfdfkiilmndbepbbec)
 
 For local development:
 
@@ -31,7 +31,7 @@ For local development:
 - **Dynamic form support** — Labels newly inserted hidden fields without creating duplicates.
 - **Feature toggle** — Enables or disables the extension's page features, stores that preference locally, and refreshes the active page when possible after a change.
 - **Compact popup** — Uses a 400 × 260px layout with the extension logo, feature toggle, cache status, Form ID, installed version, and support link.
-- **Consistent diagnostics** — Uses the **Dynamics 365 Form Debugger** console prefix with blue branding and clear black message text.
+- **Consistent diagnostics** — Uses the **Form Debugger** console prefix with blue branding and clear black message text.
 - **Localized interface** — Supports ten languages through eleven native Chrome locale catalogs.
 - **No runtime dependencies or telemetry** — Uses browser APIs and plain HTML, CSS, and JavaScript only.
 
@@ -114,9 +114,13 @@ Behavior changes should also be tested by loading `Chrome-Edge/` as an unpacked 
 
 ## Release Materials
 
-Version 1.4.0 metadata, store descriptions, and artwork are prepared locally. See [store listing copy](docs/STORE_LISTING.md), the [release audit](docs/RELEASE_1.4.0.md), and the [publication handoff](docs/PUBLISHING.md) for package contents, verification, and remaining browser checks. The [prepared privacy policy](docs/PRIVACY_POLICY.md) must also match the public policy used by the stores. Preparing these files does not publish an update to either browser store.
+Version 1.4.1 metadata and store descriptions are prepared locally. Promotional artwork still shows the earlier 1.4.0 version; refresh it before submission. See [store listing copy](docs/STORE_LISTING.md), the [release audit](docs/RELEASE_1.4.0.md), and the [publication handoff](docs/PUBLISHING.md) for package contents, verification, and remaining browser checks. The [prepared privacy policy](docs/PRIVACY_POLICY.md) must also match the public policy used by the stores. Preparing these files does not publish an update to either browser store.
 
 ## Changelog
+
+### [1.4.1] - 2026-10-17
+
+- Rename the extension to **Form Debugger** across the popup, browser name and toolbar tooltip, all eleven locale catalogs, diagnostics, and documentation.
 
 ### [1.4.0] - 2026-10-01
 
@@ -144,7 +148,7 @@ Version 1.4.0 metadata, store descriptions, and artwork are prepared locally. Se
 - Removed persisted state and the `storage` permission.
 - Redesigned the popup to a compact 400 × 218px layout with centered branding, cache status, Form ID, runtime version, and support access.
 - Removed the popup field-count and separate form-detection status rows.
-- Updated console branding to **Dynamics 365 Form Debugger**, with a blue plugin name and black diagnostic text.
+- Updated console branding, with a blue plugin name and black diagnostic text.
 - Improved Chrome API error handling and centralized message types, selectors, URLs, and logging styles.
 - Updated privacy and permissions documentation to match current behavior.
 - Added native Chrome localization for English, Spanish, German, Japanese, French, Portuguese, Russian, Italian, Dutch, and Polish.
@@ -163,8 +167,8 @@ Visit [mylokaye.me](https://mylokaye.me) for support and feedback.
 
 ## Legal Notice
 
-**Dynamics 365** and **Microsoft Edge** are registered trademarks of **Microsoft Corporation**. Dynamics 365 Form Debugger is an independent tool created by **Mylo Kaye** and is not affiliated with, endorsed by, or sponsored by Microsoft Corporation.
+**Dynamics 365** and **Microsoft Edge** are registered trademarks of **Microsoft Corporation**. Form Debugger is an independent tool created by **Mylo Kaye** and is not affiliated with, endorsed by, or sponsored by Microsoft Corporation.
 
 - **Author:** Mylo Kaye
 - **License:** Apache 2.0
-- **Version:** 1.4.0
+- **Version:** 1.4.1

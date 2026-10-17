@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Dynamics 365 Form Debugger" },
+  "extensionName": { "message": "Form Debugger" },
   "extensionDescription": { "message": "Depure formulários do Dynamics 365 Journeys: copie IDs, edite campos ocultos e ignore o cache do formulário." },
   "extensionDetails": { "message": "Detalhes da extensão" },
   "extensionToggleLabel": { "message": "Recursos da extensão" },

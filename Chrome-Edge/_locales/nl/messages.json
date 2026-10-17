@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Dynamics 365 Form Debugger" },
+  "extensionName": { "message": "Form Debugger" },
   "extensionDescription": { "message": "Inspecteer Dynamics 365 Journeys-formulieren: kopieer formulier-ID's, bewerk verborgen velden en omzeil de cache." },
   "extensionDetails": { "message": "Extensiedetails" },
   "extensionToggleLabel": { "message": "Extensiefuncties" },

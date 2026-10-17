@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Dynamics 365 Form Debugger" },
+  "extensionName": { "message": "Form Debugger" },
   "extensionDescription": { "message": "Debuguj formularze Dynamics 365 Journeys: kopiuj ich ID, edytuj ukryte pola i omijaj pamięć podręczną formularzy." },
   "extensionDetails": { "message": "Szczegóły rozszerzenia" },
   "extensionToggleLabel": { "message": "Funkcje rozszerzenia" },

@@ -1,10 +1,10 @@
-# Store listing copy — 1.4.0
+# Store listing copy — 1.4.1
 
-Prepared on 1 October 2026 for Chrome Web Store and Microsoft Edge Add-ons. This file is submission-ready copy, not a record of a published store update.
+Updated on 17 October 2026 for Chrome Web Store and Microsoft Edge Add-ons. This file is submission-ready copy, not a record of a published store update.
 
 ## Name
 
-Dynamics 365 Form Debugger
+Form Debugger
 
 ## Short description
 
@@ -26,7 +26,12 @@ Inspect and test Dynamics 365 Customer Insights - Journeys forms in Chrome or Mi
 
 The extension inspects the first detected Dynamics form container in the top-level page. Script-embedded forms on third-party pages can be inspected, but those page URLs are not changed automatically. To inspect a form inside a cross-origin iframe, open its standalone Dynamics URL directly. Browser-internal pages cannot run the content script.
 
-## What's new in 1.4.0
+## What's new in 1.4.1
+
+- Renamed the extension to **Form Debugger** across the popup, browser name, toolbar tooltip, all eleven locales, and console diagnostics.
+- Updated documentation and branding; existing form-debugging behavior and permissions are unchanged.
+
+## Previous improvements in 1.4.0
 
 - Cache bypass now supports the complete HTTPS `mkt.dynamics.com` domain family, including `assets1-gbr` and other numbered or nested subdomains.
 - Popup cache status reflects the current URL instead of assuming bypass from the feature toggle.
@@ -44,7 +49,7 @@ Only the enabled/disabled preference is persisted in `chrome.storage.local`. Ope
 - `*://*.dynamics.com/*`: read supported tab URLs and update the bypass marker on the Marketing domain.
 - `<all_urls>` content-script matches: inspect script-embedded Dynamics forms on third-party websites. Field inspection is scoped to the detected Dynamics form container.
 
-No additional permissions, remote code, or data collection were introduced for 1.4.0. Broad content-script site access remains an existing store-review consideration.
+No additional permissions, remote code, or data collection were introduced for 1.4.1. Broad content-script site access remains an existing store-review consideration.
 
 ## Dashboard fields
 
@@ -73,12 +78,11 @@ The prepared privacy policy is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md). Review
 | File | Purpose | Dimensions |
 | --- | --- | --- |
 | `Chrome-Edge/icons/icon128.png` | Installation and store icon | 128 × 128 |
-| `Screenshots/1280.png` | Current UI screenshot with example form | 1280 × 800 |
-| `Screenshots/440.png` | Small promotional tile | 440 × 280 |
-| `Screenshots/1400.png` | Marquee promotional image | 1400 × 560 |
-| `docs/dynamics-365-form-debugger-banner.jpg` | Repository banner | 1280 × 640 |
+| `Screenshots/Form-debugger-1400 (440 x 280 px).png` | Promotional example, renamed to Form Debugger | 1280 × 800 |
+| `Screenshots/Form-debugger-1400 (440 x 280 px).jpg` | JPEG copy of the promotional example | 1280 × 800 |
+| `docs/form-debugger-banner.jpg` | Repository banner | 1280 × 640 |
 
-The UI example uses the packaged 1.4.0 popup, current logo, and synthetic form metadata. It contains no customer data. Artwork dimensions follow [Chrome Web Store image guidance](https://developer.chrome.com/docs/webstore/images). The 128-pixel icon retains the existing rounded-square branding; Chrome recommends inset artwork for consistent visual weight across listings.
+The promotional example was edited with image generation on 17 October 2026 to show the Form Debugger name; it is illustrative artwork, not fresh installed-extension verification. Both files are 1280 × 800 despite their legacy filenames. The earlier 440 × 280 and 1400 × 560 assets are absent from the current checkout; prepare those sizes before a store release. Artwork dimensions follow [Chrome Web Store image guidance](https://developer.chrome.com/docs/webstore/images). The 128-pixel icon retains the existing rounded-square branding; Chrome recommends inset artwork for consistent visual weight across listings.
 
 The extension ZIP includes the runtime files, locale catalogs, required icons, and license. Store images, historical design concepts, README material, `.DS_Store`, signing keys, and development files are excluded.
 
@@ -86,4 +90,4 @@ The extension ZIP includes the runtime files, locale catalogs, required icons, a
 
 Support: [mylokaye.me](https://mylokaye.me).
 
-Dynamics 365 Form Debugger is an independent tool by Mylo Kaye. It is not affiliated with, endorsed by, or sponsored by Microsoft Corporation.
+Form Debugger is an independent tool by Mylo Kaye. It is not affiliated with, endorsed by, or sponsored by Microsoft Corporation.

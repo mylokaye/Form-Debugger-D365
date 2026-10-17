@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Dynamics 365 Form Debugger" },
+  "extensionName": { "message": "Form Debugger" },
   "extensionDescription": { "message": "Dynamics 365 Journeys-Formulare prüfen: Formular-IDs kopieren, ausgeblendete Felder bearbeiten und den Formularcache umgehen." },
   "extensionDetails": { "message": "Erweiterungsdetails" },
   "extensionToggleLabel": { "message": "Erweiterungsfunktionen" },

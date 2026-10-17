@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Dynamics 365 Form Debugger" },
+  "extensionName": { "message": "Form Debugger" },
   "extensionDescription": { "message": "Проверяйте формы Dynamics 365 Journeys: копируйте ID форм, редактируйте скрытые поля и обходите кэш форм." },
   "extensionDetails": { "message": "Сведения о расширении" },
   "extensionToggleLabel": { "message": "Функции расширения" },

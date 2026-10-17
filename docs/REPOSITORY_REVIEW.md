@@ -32,14 +32,14 @@ The extension automatically renders editable hidden-field copies and applies cac
 │   ├── STORE_LISTING.md
 │   ├── PUBLISHING.md
 │   ├── PRIVACY_POLICY.md
-│   ├── dynamics-365-form-debugger-banner.jpg
+│   ├── form-debugger-banner.jpg
 │   └── design/
 ├── Screenshots/
 ├── LICENSE
 └── README.md
 ```
 
-The manifest and README use version `1.4.0`. The declared action icons are 16, 48, and 128 pixels. The popup also uses the packaged 300-pixel icon for its centered brand mark. Store images under `Screenshots/` show the current branding and 1.4.0 interface; historical concept artwork under `docs/design/` is excluded from the extension package.
+The manifest and README use version `1.4.1`. The declared action icons are 16, 48, and 128 pixels. The popup also uses the packaged 300-pixel icon for its centered brand mark. Store images under `Screenshots/` show the current branding and 1.4.0 interface; historical concept artwork under `docs/design/` is excluded from the extension package.
 
 ## Architecture
 

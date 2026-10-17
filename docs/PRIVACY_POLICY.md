@@ -1,8 +1,8 @@
-# Dynamics 365 Form Debugger privacy policy
+# Form Debugger privacy policy
 
-Prepared for version 1.4.0 on 1 October 2026. This source is ready to publish at the extension's public privacy-policy URL; preparing it here does not change that website.
+Prepared for version 1.4.1 on 17 October 2026. This source is ready to publish at the extension's public privacy-policy URL; preparing it here does not change that website.
 
-Dynamics 365 Form Debugger is an independent Chrome and Microsoft Edge extension by Mylo Kaye for inspecting and testing Dynamics 365 Customer Insights - Journeys forms.
+Form Debugger is an independent Chrome and Microsoft Edge extension by Mylo Kaye for inspecting and testing Dynamics 365 Customer Insights - Journeys forms.
 
 ## Local form inspection
 
@@ -33,4 +33,4 @@ The extension has no analytics, advertising, remote executable code, or develope
 
 For privacy questions, contact Mylo Kaye at `mylo@mylokaye.com` or through the public Form-Debugger-D365 GitHub repository. The public policy will be updated if the extension's data handling materially changes.
 
-Dynamics 365 Form Debugger is not affiliated with, endorsed by, or sponsored by Microsoft Corporation or Google.
+Form Debugger is not affiliated with, endorsed by, or sponsored by Microsoft Corporation or Google.

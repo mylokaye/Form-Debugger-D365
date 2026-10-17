@@ -4,7 +4,7 @@ This file defines the working rules for AI agents and contributors in this repos
 
 ## Project Overview
 
-Dynamics 365 Form Debugger is a dependency-free Chrome and Microsoft Edge extension for inspecting Dynamics 365 Customer Insights - Journeys forms and applying the `#d365mkt-nocache` cache-bypass hash.
+Form Debugger is a dependency-free Chrome and Microsoft Edge extension for inspecting Dynamics 365 Customer Insights - Journeys forms and applying the `#d365mkt-nocache` cache-bypass hash.
 
 The shipped extension lives in `Chrome-Edge/` and currently uses Manifest V3 with plain HTML, CSS, and JavaScript. There is no build step, package manager, automated test suite, or generated source. Keep the extension loadable as an unpacked extension directly from `Chrome-Edge/` unless a deliberate tooling migration is part of the task.
 

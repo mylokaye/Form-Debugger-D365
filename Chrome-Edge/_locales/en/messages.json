@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Dynamics 365 Form Debugger" },
+  "extensionName": { "message": "Form Debugger" },
   "extensionDescription": { "message": "Debug Dynamics 365 Journeys forms: copy Form IDs, edit hidden fields, and bypass form cache." },
   "extensionDetails": { "message": "Extension details" },
   "extensionToggleLabel": { "message": "Extension features" },

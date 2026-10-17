@@ -29,7 +29,7 @@ function getMessage(name, fallback) {
 }
 
 document.documentElement.lang = chrome.i18n.getUILanguage();
-document.title = getMessage("extensionName", "Dynamics 365 Form Debugger");
+document.title = getMessage("extensionName", "Form Debugger");
 extensionToggleLabel.textContent = getMessage("extensionToggleLabel", "Extension features");
 formIdLabel.textContent = getMessage("formIdLabel", "Form ID:");
 formIdButton.title = getMessage("copyFormId", "Copy Form ID");

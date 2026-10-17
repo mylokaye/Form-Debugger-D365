@@ -2,6 +2,8 @@
 
 Prepared locally on 1 October 2026. The extension package and store materials are ready for upload. Installed Chrome checks passed for the main workflows; the remaining verification limits and public-policy update are listed below. No browser-store update was submitted or published in this task.
 
+> Historical audit: the package names, checksums, and verification below describe the 1 October snapshot. The 17 October Form Debugger rename changes source and listing materials; rebuild packages and repeat release checks before publication. These checksums do not validate the renamed source.
+
 ## Release contents
 
 - Manifest and popup version: `1.4.0`. The popup reads the installed manifest version rather than hard-coding it.
@@ -21,7 +23,7 @@ Prepared locally on 1 October 2026. The extension package and store materials ar
 | `Screenshots/1280.png` | 1280 × 800 | Refreshed UI screenshot |
 | `Screenshots/440.png` | 440 × 280 | Refreshed small promotional tile |
 | `Screenshots/1400.png` | 1400 × 560 | Refreshed marquee image |
-| `docs/dynamics-365-form-debugger-banner.jpg` | 1280 × 640 | Current repository banner |
+| `docs/form-debugger-banner.jpg` | 1280 × 640 | Current repository banner |
 
 ## Package audit
 

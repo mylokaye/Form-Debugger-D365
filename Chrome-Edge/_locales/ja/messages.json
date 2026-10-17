@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Dynamics 365 Form Debugger" },
+  "extensionName": { "message": "Form Debugger" },
   "extensionDescription": { "message": "Dynamics 365 Journeys フォームを検査し、フォーム ID のコピー、非表示フィールドの編集、キャッシュの回避を行います。" },
   "extensionDetails": { "message": "拡張機能の詳細" },
   "extensionToggleLabel": { "message": "拡張機能の機能" },
